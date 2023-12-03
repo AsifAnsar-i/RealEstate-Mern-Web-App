@@ -1,23 +1,9 @@
-import React, { useEffect } from "react";
+import React from "react";
 import { FaSearch } from "react-icons/fa";
-import { Link, useNavigate } from "react-router-dom";
-import { useSelector, useDispatch } from "react-redux";
-import { logout, reset } from "../features/auth/authSlice";
-import { toast } from "react-toastify";
+import { Link} from "react-router-dom";
+import { useSelector} from "react-redux";
 const Header = () => {
-  const navigate = useNavigate();
-  const dispatch = useDispatch();
-  const { user, isSuccess } = useSelector((state) => state.auth);
-  const logoutHandle = () => {
-    dispatch(logout());
-    dispatch(reset());
-    toast.success("Logout Successfully");
-  };
-  useEffect(() => {
-    if (isSuccess || !user) {
-      navigate("/sign-in");
-    }
-  }, [user, isSuccess, dispatch]);
+  const { user } = useSelector((state) => state.auth);
 
   return (
     <header className="bg-slate-200 shadow-md">
