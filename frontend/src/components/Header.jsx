@@ -1,12 +1,28 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { FaSearch } from "react-icons/fa";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { useSelector, useDispatch } from "react-redux";
+import { logout, reset } from "../features/auth/authSlice";
+import { toast } from "react-toastify";
 const Header = () => {
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
+  const { user, isSuccess } = useSelector((state) => state.auth);
+  const logoutHandle = () => {
+    dispatch(logout());
+    dispatch(reset());
+    toast.success("Logout Successfully");
+  };
+  useEffect(() => {
+    if (isSuccess || !user) {
+      navigate("/sign-in");
+    }
+  }, [user, isSuccess, dispatch]);
+
   return (
     <header className="bg-slate-200 shadow-md">
       <div className="flex justify-between items-center max-w-6xl mx-auto p-3">
         <Link to="/">
-          {" "}
           <h1 className="font-bold text-lg sm:text-xl flex flex-wrap">
             <span className="text-slate-500">Real</span>
             <span className="text-slate-700">Estate</span>
@@ -28,13 +44,27 @@ const Header = () => {
             </li>
           </Link>
           <Link to="/about">
-            <li className="hidden sm:inline text-slate-700 hover:underline">About</li>
-          </Link>
-          <Link to="/sign-in">
-            <li className="sm:inline text-slate-700 hover:underline">
-              Sign in
+            <li className="hidden sm:inline text-slate-700 hover:underline">
+              About
             </li>
           </Link>
+          {user ? (
+            <div onClick={logoutHandle}>
+              <Link>
+                <li className="sm:inline text-slate-700 hover:underline">
+                  Logout
+                </li>
+              </Link>
+            </div>
+          ) : (
+            <>
+              <Link to="/sign-in">
+                <li className="sm:inline text-slate-700 hover:underline">
+                  Sign in
+                </li>
+              </Link>
+            </>
+          )}
         </ul>
       </div>
     </header>

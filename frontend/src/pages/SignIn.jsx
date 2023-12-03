@@ -1,12 +1,41 @@
-import React, { useState } from "react";
+import React, { useState,useEffect } from "react";
 import {Link} from "react-router-dom"
+import { useDispatch, useSelector } from "react-redux";
+import { login, reset } from "../features/auth/authSlice";
+import { useNavigate } from "react-router-dom";
+import Spinner from "../components/Spinner";
+import { toast } from "react-toastify";
 const SignIn = () => {
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
+  const { user, isLoading, isSuccess, isError, message } = useSelector(
+    (state) => state.auth
+  );
   const [email,setEmail] =useState("")
   const [password,setPassword] =useState("")
 
-  const onSubmit=(e)=>{
+  const onSubmit = (e) => {
     e.preventDefault();
-    console.warn({email,password})
+    const userData = {
+      email,
+      password,
+    };
+    {
+      dispatch(login(userData)) && toast.success("Login Successfully");
+    }
+  };
+  useEffect(() => {
+    if (isError) {
+      toast.error(message);
+    }
+    if (user || isSuccess) {
+      navigate("/");
+    }
+    dispatch(reset());
+  }, [user, isError, isSuccess, message, navigate, dispatch]);
+
+  if (isLoading) {
+    return <Spinner />;
   }
   return (
     <div className="p-3 max-w-lg mx-auto">
@@ -19,7 +48,7 @@ const SignIn = () => {
       <div className="flex gap-2 mt-5">
         <p>Don't have an account?</p>
         <Link to="/sign-up">
-          <span className="text-blue-700">Sign in</span>
+          <span className="text-blue-700">Sign up</span>
         </Link>
       </div>
     </div>
