@@ -28,11 +28,12 @@ export const registerController = async (req, res) => {
     }).save();
     return res.status(201).send({
       success: true,
-      message: "RegisterSuccessfully",
+      message: "Register Successfully",
       username: user.username,
       email: user.email,
       role: user.role,
       userId: user._id,
+      photo: user.photo,
       password: user.password,
       token: generateToken(user._id),
     });
@@ -72,11 +73,12 @@ export const loginController = async (req, res) => {
     return res.status(200).send({
       success: true,
       message: "Login Successfully",
-      name: user.username,
+      username: user.username,
       email: user.email,
       role: user.role,
       userId: user._id,
       password: user.password,
+      photo: user.photo,
       token: generateToken(user._id),
     });
   } catch (error) {
@@ -85,6 +87,40 @@ export const loginController = async (req, res) => {
       success: false,
       message: "Error in login API",
       error,
+    });
+  }
+};
+
+export const googleController = async (req, res) => {
+  try {
+    const { username, email, photo } = req.body;
+    const password = "23e3443e23097821145321wwq";
+    const existingUser=await userModel.findOne({email})
+    if(existingUser){
+      return res.status(200).send({
+           username:existingUser.username,
+           email:existingUser.email,
+           photo:existingUser.photo,
+           password,
+           token:generateToken(existingUser._id)
+      })
+    }
+    const user = await new userModel({
+      username,
+      email,
+      password,
+      photo,
+    }).save();
+    return res.status(201).send({
+      success: true,
+      message: "Register Successfully",
+      user,
+    });
+  } catch (error) {
+    console.warn(error);
+    return res.status(500).send({
+      success: false,
+      message: "Error in google auth api",
     });
   }
 };

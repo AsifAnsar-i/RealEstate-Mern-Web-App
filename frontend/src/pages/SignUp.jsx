@@ -5,6 +5,7 @@ import { register, reset } from "../features/auth/authSlice";
 import { useNavigate } from "react-router-dom";
 import Spinner from "../components/Spinner";
 import { toast } from "react-toastify";
+import OAuth from "../components/OAuth";
 const SignUp = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
@@ -22,15 +23,14 @@ const SignUp = () => {
       email,
       password,
     };
-    {
-      dispatch(register(userData)) && toast.success("Register Successfully");
-    }
+    dispatch(register(userData));
   };
   useEffect(() => {
     if (isError) {
       toast.error(message);
     }
-    if (user || isSuccess) {
+    if (isSuccess) {
+      toast.success("Register Successfully");
       navigate("/");
     }
     dispatch(reset());
@@ -70,6 +70,7 @@ const SignUp = () => {
         <button className="bg-slate-700 text-white p-3 rounded-lg uppercase hover:opacity-95 disabled:opacity-80">
           Sign up
         </button>
+        <OAuth />
       </form>
       <div className="flex gap-2 mt-5">
         <p>Have an account?</p>

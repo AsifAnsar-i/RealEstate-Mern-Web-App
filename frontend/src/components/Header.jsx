@@ -28,7 +28,6 @@ const Header = () => {
             <span className="text-slate-700">Estate</span>
           </h1>
         </Link>
-
         <form className="bg-slate-100 p-3 rounded-lg flex items-center">
           <input
             type="text"
@@ -48,23 +47,17 @@ const Header = () => {
               About
             </li>
           </Link>
-          {user ? (
-            <div onClick={logoutHandle}>
-              <Link>
-                <li className="sm:inline text-slate-700 hover:underline">
-                  Logout
-                </li>
-              </Link>
-            </div>
-          ) : (
-            <>
-              <Link to="/sign-in">
+          <div>
+            <Link to="/profile">
+              {user ? (
+                <img src={user && user.photo} alt="/" className="rounded-full h-10 w-10 object-cover ml-2" />
+              ) : (
                 <li className="sm:inline text-slate-700 hover:underline">
                   Sign in
                 </li>
-              </Link>
-            </>
-          )}
+              )}
+            </Link>
+          </div>
         </ul>
       </div>
     </header>
