@@ -95,15 +95,15 @@ export const googleController = async (req, res) => {
   try {
     const { username, email, photo } = req.body;
     const password = "23e3443e23097821145321wwq";
-    const existingUser=await userModel.findOne({email})
-    if(existingUser){
+    const existingUser = await userModel.findOne({ email });
+    if (existingUser) {
       return res.status(200).send({
-           username:existingUser.username,
-           email:existingUser.email,
-           photo:existingUser.photo,
-           password,
-           token:generateToken(existingUser._id)
-      })
+        username: existingUser.username,
+        email: existingUser.email,
+        photo: existingUser.photo,
+        password,
+        token: generateToken(existingUser._id),
+      });
     }
     const user = await new userModel({
       username,
@@ -122,6 +122,50 @@ export const googleController = async (req, res) => {
       success: false,
       message: "Error in google auth api",
     });
+  }
+};
+
+export const updateController = async (req, res, next) => {
+  // if (req.body.id !== req.params.id) {
+  //   return res.status(404).send({
+  //     message: "You can only update your own account!",
+  //     success: false
+  //   });
+  // }
+
+  try {
+    if (req.body.password) {
+      req.body.password = bcrypt.hashSync(req.body.password, 10);
+    }
+
+    // Use findByIdAndUpdate with the new option { new: true } to return the updated document
+    const user = await userModel.findByIdAndUpdate(
+      req.params.id,
+      {
+        $set: {
+          username: req.body.username,
+          email: req.body.email,
+          password: req.body.password,
+          photo: req.body.photo
+        }
+      },
+      { new: true }
+    );
+
+    if (!user) {
+      return res.status(404).send({
+        success: false,
+        message: "User not found"
+      });
+    }
+
+    return res.status(200).send({
+      success: true,
+      message: "User updated successfully",
+      user
+    });
+  } catch (error) {
+    next(error);
   }
 };
 
