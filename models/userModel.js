@@ -18,7 +18,7 @@ const userSchema = new mongoose.Schema(
     },
     photo: {
       type: String,
-      default:"https://www.google.com/url?sa=i&url=https%3A%2F%2Fwww.istockphoto.com%2Fphotos%2Fprofile-avatar&psig=AOvVaw1yQ1mkZYCy9cvQTHSZp5gK&ust=1701718448973000&source=images&cd=vfe&ved=0CBIQjRxqFwoTCMiI766B9IIDFQAAAAAdAAAAABAE",
+      default: "https://www.freeiconspng.com/thumbs/profile-icon-png/account-profile-user-icon--icon-search-engine-10.png",
     },
     role: {
       type: Number,
