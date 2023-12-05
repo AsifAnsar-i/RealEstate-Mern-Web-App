@@ -105,6 +105,7 @@ export const googleController = async (req, res) => {
         token: generateToken(existingUser._id),
       });
     }
+
     const user = await new userModel({
       username,
       email,
@@ -126,19 +127,17 @@ export const googleController = async (req, res) => {
 };
 
 export const updateController = async (req, res, next) => {
-  // if (req.body.id !== req.params.id) {
-  //   return res.status(404).send({
-  //     message: "You can only update your own account!",
-  //     success: false
-  //   });
-  // }
-
+  if (req.user.id !== req.params.id) {
+    return res.status(404).send({
+      message: "You can only update your own account!",
+      success: false,
+    });
+  }
   try {
     if (req.body.password) {
       req.body.password = bcrypt.hashSync(req.body.password, 10);
     }
 
-    // Use findByIdAndUpdate with the new option { new: true } to return the updated document
     const user = await userModel.findByIdAndUpdate(
       req.params.id,
       {
@@ -146,8 +145,8 @@ export const updateController = async (req, res, next) => {
           username: req.body.username,
           email: req.body.email,
           password: req.body.password,
-          photo: req.body.photo
-        }
+          photo: req.body.photo,
+        },
       },
       { new: true }
     );
@@ -155,14 +154,19 @@ export const updateController = async (req, res, next) => {
     if (!user) {
       return res.status(404).send({
         success: false,
-        message: "User not found"
+        message: "User not found",
       });
     }
 
     return res.status(200).send({
       success: true,
       message: "User updated successfully",
-      user
+      username: user.username,
+      email: user.email,
+      userId: user._id,
+      password: user.password,
+      photo: user.photo,
+      token:generateToken(user._id),
     });
   } catch (error) {
     next(error);

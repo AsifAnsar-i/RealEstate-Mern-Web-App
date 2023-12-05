@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
-import { logout, reset } from "../features/auth/authSlice";
+import { logout, reset, update } from "../features/auth/authSlice";
 import { toast } from "react-toastify";
 import { app } from "../firebase";
 import {
@@ -14,7 +14,7 @@ const Profile = () => {
   const fileRef = useRef(null);
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  const { user, isSuccess } = useSelector((state) => state.auth);
+  const { user, isSuccess,isLoading } = useSelector((state) => state.auth);
   const [file, setFile] = useState(undefined);
   const [filePerc, setFilePerc] = useState(0);
   const [fileUploadError, setFileUploadError] = useState(false);
@@ -24,6 +24,8 @@ const Profile = () => {
     dispatch(reset());
     toast.success("Logout Successfully");
   };
+  // console.warn(user?.userId)
+  // console.warn(user?.token)
   useEffect(() => {
     if (isSuccess || !user) {
       navigate("/sign-in");
@@ -57,15 +59,40 @@ const Profile = () => {
       },
       () => {
         getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
-          setFormData({ ...formData, avatar: downloadURL });
+          setFormData({ ...formData, photo: downloadURL });
         });
       }
     );
   };
+
+  const submitHandle = (e) => {
+    e.preventDefault();
+    const userData = {
+      userData: formData,
+      token: user?.token, // Replace with the actual token
+      userId: user?.userId, // Replace with the actual userId
+    };
+    dispatch(update(userData));
+  };
+  // useEffect(() => {
+  //   if (isError) {
+  //     toast.error(message);
+  //   }
+  //   if (isSuccess) {
+  //     toast.success("Login Successfully");
+  //     navigate("/");
+  //   }
+  //   dispatch(reset());
+  // }, [user, isError, isSuccess, message, navigate, dispatch]);
+
+  const handleChange = (e) => {
+    setFormData({ ...formData, [e.target.id]: e.target.value });
+  };
+
   return (
     <div className="p-3 max-w-lg mx-auto">
       <h1 className="text-3xl font-semibold text-center my-7">Profile</h1>
-      <form className="flex flex-col gap-4">
+      <form onSubmit={submitHandle} className="flex flex-col gap-4">
         <input
           onChange={(e) => setFile(e.target.files[0])}
           type="file"
@@ -75,45 +102,49 @@ const Profile = () => {
         />
         <img
           onClick={() => fileRef.current.click()}
-          src={formData.avatar ||  user && user.photo}
+          src={formData.photo || (user && user.photo)}
           alt="/"
           className="rounded-full h-24 w-24 object-cover
             cursor-pointer self-center mt-2
             "
         />
         <p className="text-sm self-center">
-          {
-            fileUploadError ? (
-              <span className="text-red-700">Error Image upload</span>
-            ):filePerc>0 && filePerc<100 ? (
-              <span className="text-slate-700">{`Uploading ${filePerc}%`}</span>
-            ):filePerc===100? (
-              <span className="text-green-700">Image successfully uploaded!</span>
-            ):(
-              ''
-            )
-          }
+          {fileUploadError ? (
+            <span className="text-red-700">Error Image upload</span>
+          ) : filePerc > 0 && filePerc < 100 ? (
+            <span className="text-slate-700">{`Uploading ${filePerc}%`}</span>
+          ) : filePerc === 100 ? (
+            <span className="text-green-700">Image successfully uploaded!</span>
+          ) : (
+            ""
+          )}
         </p>
         <input
           type="text"
           placeholder="username"
           id="username"
+          defaultValue={user && user.username}
+          onChange={handleChange}
           className="border p-3 rounded-lg focus:outline-none"
         />
         <input
           type="email"
           placeholder="email"
           id="email"
+          defaultValue={user && user.email}
           className="border p-3 rounded-lg focus:outline-none"
+          readOnly
         />
         <input
           type="password"
           placeholder="password"
           id="password"
+          defaultValue={user && user.password}
+          onChange={handleChange}
           className="border p-3 rounded-lg focus:outline-none"
         />
         <button className="bg-slate-700 text-white rounded-lg p-3 uppercase hover:opacity-95 disabled:opacity-80">
-          update
+         {isLoading?'Loading...':"update"} 
         </button>
       </form>
       <div className="flex justify-between mt-5">

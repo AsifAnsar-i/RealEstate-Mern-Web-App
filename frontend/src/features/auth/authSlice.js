@@ -50,6 +50,7 @@ export const google = createAsyncThunk(
   async (user, thunkAPI) => {
     try {
       return await authService.google(user);
+     
     } catch (error) {
       const message =
         (error.response &&
@@ -61,6 +62,27 @@ export const google = createAsyncThunk(
     }
   }
 );
+
+
+//update
+export const update = createAsyncThunk(
+  "auth/update",
+  async ({ userData, token, userId }, thunkAPI) => {
+    try {
+      return await authService.update(userData, token, userId);
+      
+    } catch (error) {
+      const message =
+        (error.response &&
+          error.response.data &&
+          error.response.data.message) ||
+        error.message ||
+        error.toString();
+      return thunkAPI.rejectWithValue(message);
+    }
+  }
+);
+
 
 export const logout = createAsyncThunk("auth/logout", async () => {
   await authService.logout();
@@ -116,6 +138,19 @@ export const authSlice = createSlice({
         state.user = action.payload;
       })
       .addCase(google.rejected, (state, action) => {
+        state.isLoading = false;
+        state.isError = true;
+        state.message = action.payload;
+        state.user = null;
+      })
+      .addCase(update.pending, (state) => {
+        state.isLoading = true;
+      })
+      .addCase(update.fulfilled, (state,action) => {
+        state.isLoading = false;
+        state.user = action.payload;
+      })
+      .addCase(update.rejected, (state, action) => {
         state.isLoading = false;
         state.isError = true;
         state.message = action.payload;
