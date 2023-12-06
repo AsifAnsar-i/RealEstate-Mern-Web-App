@@ -155,7 +155,7 @@ const Profile = () => {
         <button className="bg-slate-700 text-white rounded-lg p-3 uppercase hover:opacity-95 disabled:opacity-80">
           {isLoading ? "Loading..." : "update"}
         </button>
-        <Link className="bg-green-700 text-white p-3 uppercase hover:opacity-95 disabled:opacity-80 rounded-xl text-center" to="/create-listing">Create Listing</Link>
+        <Link className="bg-green-700 text-white p-3 uppercase hover:opacity-95 disabled:opacity-80 rounded-lg text-center" to="/create-listing">Create Listing</Link>
       </form>
       <div className="flex justify-between mt-5">
         <span onClick={deleteHandle} className="text-red-700 cursor-pointer">
