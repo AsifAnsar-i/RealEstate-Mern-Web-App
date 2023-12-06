@@ -126,7 +126,7 @@ export const googleController = async (req, res) => {
   }
 };
 
-export const updateController = async (req, res, next) => {
+export const updateController = async (req, res) => {
   if (req.user.id !== req.params.id) {
     return res.status(404).send({
       message: "You can only update your own account!",
@@ -169,9 +169,38 @@ export const updateController = async (req, res, next) => {
       token:generateToken(user._id),
     });
   } catch (error) {
-    next(error);
+    return res.status(500).send({
+      success:false,
+      message:"Error in update user API",
+      error
+    })
   }
 };
+
+
+
+export const deleteController=async(req,res)=>{
+  if (req.user.id !== req.params.id) {
+    return res.status(404).send({
+      message: "You can only delete your own account!",
+      success: false,
+    });
+  }
+    try {
+      await userModel.findByIdAndDelete(req.params.id)
+      return res.status(201).send({
+        success:true,
+        message:"User deleted successfully",
+      })
+      
+    } catch (error) {
+      return res.status(500).send({
+        success:false,
+        message:"Error in delete user API",
+        error
+      })
+    }
+}
 
 const generateToken = (id) => {
   return JWT.sign({ id }, process.env.JWT_SECRET, { expiresIn: "30d" });

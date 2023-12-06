@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
-import { logout, reset, update } from "../features/auth/authSlice";
+import { deleteUser, logout, reset, update } from "../features/auth/authSlice";
 import { toast } from "react-toastify";
 import { app } from "../firebase";
 import {
@@ -14,7 +14,7 @@ const Profile = () => {
   const fileRef = useRef(null);
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  const { user, isSuccess,isLoading } = useSelector((state) => state.auth);
+  const { user, isSuccess, isLoading } = useSelector((state) => state.auth);
   const [file, setFile] = useState(undefined);
   const [filePerc, setFilePerc] = useState(0);
   const [fileUploadError, setFileUploadError] = useState(false);
@@ -69,8 +69,8 @@ const Profile = () => {
     e.preventDefault();
     const userData = {
       userData: formData,
-      token: user?.token, // Replace with the actual token
-      userId: user?.userId, // Replace with the actual userId
+      token: user?.token,
+      userId: user?.userId,
     };
     dispatch(update(userData));
   };
@@ -89,6 +89,16 @@ const Profile = () => {
     setFormData({ ...formData, [e.target.id]: e.target.value });
   };
 
+  const deleteHandle = (e) => {
+    e.preventDefault();
+    const delUser = {
+      token: user?.token,
+      userId: user?.userId,
+    };
+    dispatch(deleteUser(delUser));
+    navigate("/sign-in");
+  };
+
   return (
     <div className="p-3 max-w-lg mx-auto">
       <h1 className="text-3xl font-semibold text-center my-7">Profile</h1>
@@ -103,7 +113,7 @@ const Profile = () => {
         <img
           onClick={() => fileRef.current.click()}
           src={formData.photo || (user && user.photo)}
-          alt="/"
+          alt="profile"
           className="rounded-full h-24 w-24 object-cover
             cursor-pointer self-center mt-2
             "
@@ -139,16 +149,17 @@ const Profile = () => {
           type="password"
           placeholder="password"
           id="password"
-          defaultValue={user && user.password}
           onChange={handleChange}
           className="border p-3 rounded-lg focus:outline-none"
         />
         <button className="bg-slate-700 text-white rounded-lg p-3 uppercase hover:opacity-95 disabled:opacity-80">
-         {isLoading?'Loading...':"update"} 
+          {isLoading ? "Loading..." : "update"}
         </button>
       </form>
       <div className="flex justify-between mt-5">
-        <span className="text-red-700 cursor-pointer">Delete account</span>
+        <span onClick={deleteHandle} className="text-red-700 cursor-pointer">
+          Delete account
+        </span>
         <span onClick={logoutHandle} className="text-red-700 cursor-pointer">
           Sign out
         </span>

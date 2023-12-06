@@ -4,6 +4,7 @@ const API_REG = "/api/v1/auth/sign-up";
 const API_LOG = "/api/v1/auth/sign-in";
 const API_GOG = "/api/v1/auth/google";
 const API_UPD = "/api/v1/auth/update";
+const API_DELU = "/api/v1/auth/delete";
 
 const register = async (userData) => {
   const response = await axios.post(API_REG, userData);
@@ -37,7 +38,7 @@ const google = async (userData) => {
 const update = async ( userData, token, userId ) => {
   const response = await axios.post(`${API_UPD}/${userId}`, userData, {
     headers: {
-      Authorization: `Bearer ${token}`, // Replace with the actual token
+      Authorization: `Bearer ${token}`, 
     },
   });
    
@@ -50,6 +51,19 @@ const update = async ( userData, token, userId ) => {
 
 
 
+const deleteUser = async (token, userId ) => {
+  const response = await axios.delete(`${API_DELU}/${userId}`, {
+    headers: {
+      Authorization: `Bearer ${token}`, 
+    },
+  });
+   
+  if (response.data) {
+    localStorage.removeItem("user")
+  }
+  return response.data;
+};
+
 
 
 const logout = async () => {
@@ -61,6 +75,7 @@ const authService = {
   logout,
   google,
   login,
-  update
+  update,
+  deleteUser
 };
 export default authService;
