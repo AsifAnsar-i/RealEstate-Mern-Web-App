@@ -20,7 +20,7 @@ app.use(cors());
 const port = 8080;
 
 app.use("/api/v1/auth", authRoutes);
-app.use("/api/v1/user", listingRoutes);
+app.use("/api/v1/listing", listingRoutes);
 
 app.listen(port, () => {
   console.warn(`Server running on ${port}`.bgMagenta.white);
