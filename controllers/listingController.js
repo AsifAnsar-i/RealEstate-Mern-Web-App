@@ -4,9 +4,9 @@ export const listingController = async (req, res) => {
   try {
     const listing = await listingModel.create(req.body);
     return res.status(201).send({
-      success: true,
-      message: "listing created Successfully",
-      listing,
+      success:true,
+      message:"Listing created successfully",
+      listing
     });
   } catch (error) {
     console.warn(error);

@@ -6,6 +6,7 @@ const Home = () => {
   return (
     <div className="text-2xl text-center mt-28">
       <h1 className="">Hi, {user && user.username}</h1>
+      
     </div>
   );
 };

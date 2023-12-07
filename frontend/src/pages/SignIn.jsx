@@ -25,7 +25,7 @@ const SignIn = () => {
   };
   useEffect(() => {
     if (isError) {
-      toast.error(message);
+     toast.error(message);
     }
     if (isSuccess) {
       toast.success("Login Successfully");
@@ -58,7 +58,7 @@ const SignIn = () => {
           onChange={(e) => setPassword(e.target.value)}
         />
         <button className="bg-slate-700 text-white p-3 rounded-lg uppercase hover:opacity-95 disabled:opacity-80">
-          Sign up
+          Sign in
         </button>
         <OAuth />
       </form>
