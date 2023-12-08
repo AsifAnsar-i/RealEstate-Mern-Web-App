@@ -10,8 +10,10 @@ import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import PrivateRoute from "./components/PrivateRoute";
 import CreateListing from "./pages/CreateListing";
+import ListingPage from "./pages/ListingPage";
 
 const App = () => {
+
   return (
     <BrowserRouter>
       <Header />
@@ -23,6 +25,7 @@ const App = () => {
         </Route>
         <Route path="/sign-in" element={<SignIn />} />
         <Route path="/sign-up" element={<SignUp />} />
+        <Route path="/listing-page" element={<ListingPage />} />
         <Route element={<PrivateRoute />}>
           <Route path="/create-listing" element={<CreateListing />} />
         </Route>

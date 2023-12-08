@@ -50,7 +50,6 @@ export const google = createAsyncThunk(
   async (user, thunkAPI) => {
     try {
       return await authService.google(user);
-     
     } catch (error) {
       const message =
         (error.response &&
@@ -62,7 +61,6 @@ export const google = createAsyncThunk(
     }
   }
 );
-
 
 //update
 export const update = createAsyncThunk(
@@ -70,7 +68,6 @@ export const update = createAsyncThunk(
   async ({ userData, token, userId }, thunkAPI) => {
     try {
       return await authService.update(userData, token, userId);
-      
     } catch (error) {
       const message =
         (error.response &&
@@ -82,16 +79,13 @@ export const update = createAsyncThunk(
     }
   }
 );
-
-
 
 //deleteUser
 export const deleteUser = createAsyncThunk(
   "auth/deleteUser",
-  async ({  token, userId }, thunkAPI) => {
+  async ({ token, userId }, thunkAPI) => {
     try {
       return await authService.deleteUser(token, userId);
-      
     } catch (error) {
       const message =
         (error.response &&
@@ -103,28 +97,6 @@ export const deleteUser = createAsyncThunk(
     }
   }
 );
-
-
-
-//listing
-export const listing = createAsyncThunk(
-  "auth/listing",
-  async ({ userData, token}, thunkAPI) => {
-    try {
-      return await authService.listing(userData, token);
-      
-    } catch (error) {
-      const message =
-        (error.response &&
-          error.response.data &&
-          error.response.data.message) ||
-        error.message ||
-        error.toString();
-      return thunkAPI.rejectWithValue(message);
-    }
-  }
-);
-
 
 export const logout = createAsyncThunk("auth/logout", async () => {
   await authService.logout();
@@ -174,7 +146,7 @@ export const authSlice = createSlice({
       .addCase(google.pending, (state) => {
         state.isLoading = true;
       })
-      .addCase(google.fulfilled, (state,action) => {
+      .addCase(google.fulfilled, (state, action) => {
         state.isLoading = false;
         state.isSuccess = true;
         state.user = action.payload;
@@ -188,7 +160,7 @@ export const authSlice = createSlice({
       .addCase(update.pending, (state) => {
         state.isLoading = true;
       })
-      .addCase(update.fulfilled, (state,action) => {
+      .addCase(update.fulfilled, (state, action) => {
         state.isLoading = false;
         state.user = action.payload;
       })
@@ -203,22 +175,9 @@ export const authSlice = createSlice({
       })
       .addCase(deleteUser.fulfilled, (state) => {
         state.isLoading = false;
-        state.user=null
-      })
-      .addCase(deleteUser.rejected, (state, action) => {
-        state.isLoading = false;
-        state.isError = true;
-        state.message = action.payload;
         state.user = null;
       })
-      .addCase(listing.pending, (state) => {
-        state.isLoading = true;
-      })
-      .addCase(listing.fulfilled, (state, action) => {
-        state.isLoading = false;
-        state.isSuccess = true;
-      })
-      .addCase(listing.rejected, (state, action) => {
+      .addCase(deleteUser.rejected, (state, action) => {
         state.isLoading = false;
         state.isError = true;
         state.message = action.payload;

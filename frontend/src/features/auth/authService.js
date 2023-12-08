@@ -5,7 +5,6 @@ const API_LOG = "/api/v1/auth/sign-in";
 const API_GOG = "/api/v1/auth/google";
 const API_UPD = "/api/v1/auth/update";
 const API_DELU = "/api/v1/auth/delete";
-const API_LIST = "/api/v1/listing/create";
 
 const register = async (userData) => {
   const response = await axios.post(API_REG, userData);
@@ -34,51 +33,33 @@ const google = async (userData) => {
   return response.data;
 };
 
-
-
-const update = async ( userData, token, userId ) => {
+const update = async (userData, token, userId) => {
   const response = await axios.post(`${API_UPD}/${userId}`, userData, {
     headers: {
-      Authorization: `Bearer ${token}`, 
+      Authorization: `Bearer ${token}`,
     },
   });
-   
+
   if (response.data) {
-    localStorage.removeItem("user")
+    localStorage.removeItem("user");
     localStorage.setItem("user", JSON.stringify(response.data));
   }
+
   return response.data;
 };
 
-
-
-const deleteUser = async (token, userId ) => {
+const deleteUser = async (token, userId) => {
   const response = await axios.delete(`${API_DELU}/${userId}`, {
     headers: {
-      Authorization: `Bearer ${token}`, 
+      Authorization: `Bearer ${token}`,
     },
   });
-   
+
   if (response.data) {
-    localStorage.removeItem("user")
+    localStorage.removeItem("user");
   }
   return response.data;
 };
-
-
-
-const listing = async ( userData, token) => {
-  const response = await axios.post(API_LIST,userData, {
-    headers: {
-      Authorization: `Bearer ${token}`, 
-    },
-  });
-  // if (response.data) {
-  //   localStorage.setItem("listing", JSON.stringify(response.data));
-  // }
-  return response.data;
-};
-
 
 const logout = async () => {
   localStorage.removeItem("user");
@@ -91,6 +72,5 @@ const authService = {
   login,
   update,
   deleteUser,
-  listing
 };
 export default authService;

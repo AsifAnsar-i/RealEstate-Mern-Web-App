@@ -7,17 +7,15 @@ import {
 import React, { useState, useEffect } from "react";
 import { app } from "../firebase";
 import { useSelector, useDispatch } from "react-redux";
-import { listing, reset } from "../features/auth/authSlice";
+import { create, reset } from "../features/listing/listingSlice";
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
-import Spinner from "../components/Spinner"
 const CreateListing = () => {
   const [files, setFiles] = useState([]);
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  const { user, isLoading, isSuccess, isError, message } = useSelector(
-    (state) => state.auth
-  );
+  const {listing,ifLoading,ifSuccess,ifError,ifMessage} =useSelector((state)=>state.create)
+  const {user,isLoading, isSuccess, isError, message } = useSelector((state) => state.auth);
   const [formData, setFormData] = useState({
     imageUrls: [],
     name: "",
@@ -27,11 +25,12 @@ const CreateListing = () => {
     bedrooms: 1,
     bathrooms: 1,
     regularPrice: 50,
-    discountPrice: 50,
+    discountPrice: 0,
     offer: false,
     parking: false,
     furnished: false,
   });
+
   const [imageUploadError, setImageUploadError] = useState(false);
   const [uploading, setUploading] = useState(false);
   const handleImageSubmit = (e) => {
@@ -124,25 +123,31 @@ const CreateListing = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
+    if (formData.imageUrls.length < 1) {
+      return toast.error("upload atleast 1 image");
+    }
+    if (+formData.regularPrice < +formData.discountPrice) {
+      return toast.error("Discount price must be lower than regular price");
+    }
     const userData = {
-      userData: formData,
+      userData: { ...formData, userRef: user.userId },
       token: user?.token,
     };
-    dispatch(listing(userData));
+    console.warn(listing.listId)
+    dispatch(create(userData));
   };
-
+ 
   useEffect(() => {
-    if (isError) {
+    if (ifError) {
       toast.error(message);
     }
-    if(isSuccess){
-      navigate("/")
+    if (ifSuccess) {
+      navigate(`/listing/${listing.listId}`);
     }
     dispatch(reset());
-  }, [user, isError, isSuccess, message, navigate, dispatch]);
-  if(isLoading){
-    return <Spinner/>
-  }
+  }, [listing,ifLoading,ifSuccess,ifError,ifMessage, navigate, dispatch]);
+ 
+
   return (
     <main className="p-3 max-w-4xl mx-auto">
       <h1 className="text-center text-3xl font-semibold my-7">
@@ -276,22 +281,24 @@ const CreateListing = () => {
                 <span className="text-sm">($ / month)</span>
               </div>
             </div>
-            <div className="flex items-center gap-2">
-              <input
-                type="number"
-                id="discountPrice"
-                min="50"
-                max="10000000"
-                required
-                className="p-3 border border-gray-300 rounded-lg focus:outline-none"
-                onChange={handleChanges}
-                value={formData.discountPrice}
-              />
-              <div className="flex flex-col items-center">
-                <p>Discount price</p>
-                <span className="text-sm">($ / month)</span>
+            {formData.offer && (
+              <div className="flex items-center gap-2">
+                <input
+                  type="number"
+                  id="discountPrice"
+                  min="0"
+                  max="10000000"
+                  required
+                  className="p-3 border border-gray-300 rounded-lg focus:outline-none"
+                  onChange={handleChanges}
+                  value={formData.discountPrice}
+                />
+                <div className="flex flex-col items-center">
+                  <p>Discount price</p>
+                  <span className="text-sm">($ / month)</span>
+                </div>
               </div>
-            </div>
+            )}
           </div>
         </div>
         <div className="flex flex-col flex-1 gap-4">
@@ -342,7 +349,10 @@ const CreateListing = () => {
                 </button>
               </div>
             ))}
-          <button className="p-3 mt-5 bg-slate-700 text-white rounded-lg uppercase hover:opacity-95 disabled:opacity-80">
+          <button
+            disabled={uploading}
+            className="p-3 mt-5 bg-slate-700 text-white rounded-lg uppercase hover:opacity-95 disabled:opacity-80"
+          >
             {isLoading ? "Creating..." : "Create Listing"}
           </button>
         </div>
