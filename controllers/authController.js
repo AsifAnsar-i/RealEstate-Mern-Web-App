@@ -1,6 +1,7 @@
 import bcrypt from "bcryptjs";
 import userModel from "../models/userModel.js";
 import JWT from "jsonwebtoken";
+import listingModel from "../models/listingModel.js";
 
 export const registerController = async (req, res) => {
   try {
@@ -166,41 +167,63 @@ export const updateController = async (req, res) => {
       userId: user._id,
       password: user.password,
       photo: user.photo,
-      token:generateToken(user._id),
+      token: generateToken(user._id),
     });
   } catch (error) {
     return res.status(500).send({
-      success:false,
-      message:"Error in update user API",
-      error
-    })
+      success: false,
+      message: "Error in update user API",
+      error,
+    });
   }
 };
 
-
-
-export const deleteController=async(req,res)=>{
+export const deleteController = async (req, res) => {
   if (req.user.id !== req.params.id) {
     return res.status(404).send({
       message: "You can only delete your own account!",
       success: false,
     });
   }
+  try {
+    await userModel.findByIdAndDelete(req.params.id);
+    return res.status(201).send({
+      success: true,
+      message: "User deleted successfully",
+    });
+  } catch (error) {
+    return res.status(500).send({
+      success: false,
+      message: "Error in delete user API",
+      error,
+    });
+  }
+};
+
+export const listingsController = async (req, res) => {
+  if (req.user.id === req.params.id) {
     try {
-      await userModel.findByIdAndDelete(req.params.id)
-      return res.status(201).send({
-        success:true,
-        message:"User deleted successfully",
-      })
-      
+      const listings = await listingModel.find({ userRef: req.params.id });
+      // return res.status(200).send({
+      //   success: true,
+      //   message: "Get listings successfully",
+      //   listings,
+      // });
+      return res.status(200).json(listings)
     } catch (error) {
       return res.status(500).send({
-        success:false,
-        message:"Error in delete user API",
-        error
-      })
+        success: false,
+        message: "Error in view listing API",
+        error,
+      });
     }
-}
+  } else {
+    return res.status(404).send({
+      success: false,
+      message: "You can only view your own listing",
+    });
+  }
+};
 
 const generateToken = (id) => {
   return JWT.sign({ id }, process.env.JWT_SECRET, { expiresIn: "30d" });
