@@ -1,7 +1,8 @@
 import React, { useEffect, useRef, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
-import { deleteUser, logout, reset, update } from "../features/auth/authSlice";
+import { deleteUser, logout, reset, update} from "../features/auth/authSlice";
+import {userListing} from "../features/userlistings/userListingsSlice";
 import { toast } from "react-toastify";
 import { app } from "../firebase";
 import {
@@ -15,6 +16,7 @@ const Profile = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const { user, isSuccess, isLoading } = useSelector((state) => state.auth);
+  const { userlistings, Ssuccess, lloading,Eerror,Mmessage } = useSelector((state) => state.listing);
   const [file, setFile] = useState(undefined);
   const [filePerc, setFilePerc] = useState(0);
   const [fileUploadError, setFileUploadError] = useState(false);
@@ -98,6 +100,16 @@ const Profile = () => {
     dispatch(deleteUser(delUser));
     navigate("/sign-in");
   };
+  
+  const handleShowListing=(e)=>{
+    e.preventDefault();
+    const userList = {
+       token: user?.token,
+       userId: user.userId,
+    };
+    dispatch(userListing(userList));
+  }
+
   return (
     <div className="p-3 max-w-lg mx-auto">
       <h1 className="text-3xl font-semibold text-center my-7">Profile</h1>
@@ -164,6 +176,25 @@ const Profile = () => {
           Sign out
         </span>
       </div>
+      <button onClick={handleShowListing} className="text-green-700 w-full">Show Listings</button>
+     {userlistings && userlistings.length>0 &&
+     <div className="flex flex-col gap-4">
+     <h1 className="text-center mt-7 text-2xl font-semibold">Your Listings</h1>
+    {  userlistings.map((listing)=>(
+        <div key={listing._id} className="border rounded-lg p-3 flex justify-between items-center gap-4" >
+          <Link to={`/listing/${listing._id}`}>
+            <img src={listing.imageUrls[0]} alt="listing cover"  className="h-16 w-16 object-contain rounded-xl"/>
+          </Link>
+         <Link className="flex-1 text-slate-700 font-semibold  hover:underline truncate" to={`/listing/${listing._id}`}>
+          <p >{listing.name}</p>
+         </Link>
+         <div className="flex flex-col items-center">
+             <button className="text-red-700">Delete</button>
+             <button className="text-green-700">Edit</button>
+         </div>
+        </div>
+      ))}
+      </div>  }
     </div>
   );
 };

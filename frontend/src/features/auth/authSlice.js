@@ -98,6 +98,25 @@ export const deleteUser = createAsyncThunk(
   }
 );
 
+
+//getUserListing
+export const userListing = createAsyncThunk(
+  "auth/userListing",
+  async ({ token, userId }, thunkAPI) => {
+    try {
+      return await authService.userListing(token, userId);
+    } catch (error) {
+      const message =
+        (error.response &&
+          error.response.data &&
+          error.response.data.message) ||
+        error.message ||
+        error.toString();
+      return thunkAPI.rejectWithValue(message);
+    }
+  }
+);
+
 export const logout = createAsyncThunk("auth/logout", async () => {
   await authService.logout();
 });
@@ -189,7 +208,10 @@ export const authSlice = createSlice({
       .addCase(logout.fulfilled, (state) => {
         state.isLoading = false;
         state.user = null;
-      });
+      })
+      .addCase(userListing.fulfilled,(state)=>{
+        state.isLoading=false
+      })
   },
 });
 
